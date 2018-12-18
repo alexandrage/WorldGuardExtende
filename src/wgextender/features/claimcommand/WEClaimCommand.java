@@ -93,7 +93,8 @@ public class WEClaimCommand {
 		try {
 			Region selection = WEUtils.getSelection(player);
 			if (selection instanceof CuboidRegion) {
-				return new ProtectedCuboidRegion(id, selection.getMinimumPoint().toBlockVector(), selection.getMaximumPoint().toBlockVector());
+				return new ProtectedCuboidRegion(id, selection.getMinimumPoint().toBlockVector(), selection.getMaximumPoint().toBlockVector()); //fawe
+				//return new ProtectedCuboidRegion(id, selection.getMinimumPoint(), selection.getMaximumPoint()); //nofawe
 			} else {
 				throw new CommandException("Вы можете использовать только кубическкую территорию.");
 			}
