@@ -22,8 +22,8 @@ import java.math.BigInteger;
 import org.bukkit.entity.Player;
 
 import com.sk89q.worldedit.IncompleteRegionException;
-//import com.sk89q.worldedit.math.BlockVector3; //nofawe
-import com.sk89q.worldedit.Vector; //fawe
+import com.sk89q.worldedit.math.BlockVector3; //nofawe
+//import com.sk89q.worldedit.Vector; //fawe
 import com.sk89q.worldedit.regions.Region;
 
 import wgextender.Config;
@@ -40,10 +40,10 @@ public class BlockLimits {
 		} catch (IncompleteRegionException e) {
 			return info;
 		}
-		Vector min = psel.getMinimumPoint(); //fawe
-		Vector max = psel.getMaximumPoint(); //fawe
-		//BlockVector3 min = psel.getMinimumPoint(); //nofawe
-		//BlockVector3 max = psel.getMaximumPoint(); //nofawe
+		//Vector min = psel.getMinimumPoint(); //fawe
+		//Vector max = psel.getMaximumPoint(); //fawe
+		BlockVector3 min = psel.getMinimumPoint(); //nofawe
+		BlockVector3 max = psel.getMaximumPoint(); //nofawe
 		BigInteger size = BigInteger.ONE;
 		size = size.multiply(BigInteger.valueOf(max.getBlockX()).subtract(BigInteger.valueOf(min.getBlockX())).add(BigInteger.ONE));
 		size = size.multiply(BigInteger.valueOf(max.getBlockZ()).subtract(BigInteger.valueOf(min.getBlockZ())).add(BigInteger.ONE));

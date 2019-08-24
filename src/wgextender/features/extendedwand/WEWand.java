@@ -32,8 +32,8 @@ public class WEWand {
 	protected static Material cachedWandMaterial;
 
 	protected static Material getWandMaterial() {
-		String weWandMaterialName = WEUtils.getWorldEditPlugin().getLocalConfiguration().wandItem.getId(); //fawe
-		//String weWandMaterialName = WEUtils.getWorldEditPlugin().getLocalConfiguration().wandItem;  //nofawe
+		//String weWandMaterialName = WEUtils.getWorldEditPlugin().getLocalConfiguration().wandItem.getId(); //fawe
+		String weWandMaterialName = WEUtils.getWorldEditPlugin().getLocalConfiguration().wandItem;  //nofawe
 		if (cachedWandMaterial == null || !cachedWandMaterial.toString().equals(weWandMaterialName)) {
 			cachedWandMaterial = Material.matchMaterial(weWandMaterialName);
 		}

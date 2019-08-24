@@ -35,7 +35,7 @@ public class WEClaimCommand {
 
 		WorldGuardPlugin worldguardplugin = WorldGuardPlugin.inst();
 
-		Player player = worldguardplugin.checkPlayer(sender);
+		Player player = (Player) sender;
 
 		BukkitWorldConfiguration wcfg = WEUtils.getWorldConfig(player);
 
@@ -59,7 +59,8 @@ public class WEClaimCommand {
 		ProtectedRegion region = createProtectedRegionFromSelection(player, id);
 
 		if (!permModel.mayClaimRegionsUnbounded()) {
-			int maxRegionCount = wcfg.getMaxRegionCount(player);
+			int maxRegionCount = wcfg.getMaxRegionCount(localPlayer); //no fawe
+			//int maxRegionCount = wcfg.getMaxRegionCount(player); //fawe
 			if ((maxRegionCount >= 0) && (manager.getRegionCountOfPlayer(localPlayer) >= maxRegionCount)) {
 				throw new CommandException("У вас слишком много регионов, удалите один из них перед тем как заприватить новый.");
 			}
@@ -93,8 +94,8 @@ public class WEClaimCommand {
 		try {
 			Region selection = WEUtils.getSelection(player);
 			if (selection instanceof CuboidRegion) {
-				return new ProtectedCuboidRegion(id, selection.getMinimumPoint().toBlockVector(), selection.getMaximumPoint().toBlockVector()); //fawe
-				//return new ProtectedCuboidRegion(id, selection.getMinimumPoint(), selection.getMaximumPoint()); //nofawe
+				//return new ProtectedCuboidRegion(id, selection.getMinimumPoint().toBlockVector(), selection.getMaximumPoint().toBlockVector()); //fawe
+				return new ProtectedCuboidRegion(id, selection.getMinimumPoint(), selection.getMaximumPoint()); //nofawe
 			} else {
 				throw new CommandException("Вы можете использовать только кубическкую территорию.");
 			}
