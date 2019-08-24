@@ -41,12 +41,12 @@ public class WGRegionCommandWrapper extends Command {
 		CommandUtils.replaceComamnd(wrapper, wrapper.originalcommand);
 	}
 
-
 	protected final Config config;
 	protected final Command originalcommand;
 
 	protected WGRegionCommandWrapper(Config config, Command originalcommand) {
-		super(originalcommand.getName(), originalcommand.getDescription(), originalcommand.getUsage(), originalcommand.getAliases());
+		super(originalcommand.getName(), originalcommand.getDescription(), originalcommand.getUsage(),
+				originalcommand.getAliases());
 		this.config = config;
 		this.originalcommand = originalcommand;
 	}
@@ -68,7 +68,8 @@ public class WGRegionCommandWrapper extends Command {
 			if (!info.isClaimAllowed()) {
 				player.sendMessage(ChatColor.RED + "Вы не можете заприватить такой большой регион");
 				if (!info.getMaxSize().equals("-1")) {
-					player.sendMessage(ChatColor.RED + "Ваш лимит: "+info.getMaxSize()+", вы попытались заприватить: "+info.getClaimedSize());
+					player.sendMessage(ChatColor.RED + "Ваш лимит: " + info.getMaxSize()
+							+ ", вы попытались заприватить: " + info.getClaimedSize());
 				}
 				return true;
 			}
@@ -76,7 +77,7 @@ public class WGRegionCommandWrapper extends Command {
 			try {
 				WEClaimCommand.claim(regionname, sender);
 				if (!hasRegion && config.autoflagsenabled) {
-					AutoFlags.setFlagsForRegion(player.getWorld(), config, regionname);
+					AutoFlags.setFlagsForRegion(player.getWorld(), config, regionname, player.getLocation());
 				}
 			} catch (CommandException ex) {
 				sender.sendMessage(ChatColor.RED + ex.getMessage());

@@ -35,6 +35,7 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.util.Vector;
 
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -87,12 +88,13 @@ public class AutoFlags {
 		return rm.getRegion(regionname);
 	}
 
-	protected static void setFlagsForRegion(final World world, final Config config, final String regionname) {
+	protected static void setFlagsForRegion(final World world, final Config config, final String regionname,
+			org.bukkit.Location location) {
 		final ProtectedRegion rg = getRegion(world, regionname);
 		if (rg != null) {
 			for (Entry<Flag<?>, String> entry : config.autoflags.entrySet()) {
 				try {
-					setFlag(world, rg, entry.getKey(), entry.getValue());
+					setFlag(world, rg, entry.getKey(), entry.getValue(), location);
 				} catch (CommandException e) {
 					e.printStackTrace();
 				}
@@ -100,21 +102,26 @@ public class AutoFlags {
 		}
 	}
 
-	protected static final RegionCommands regionCommands = new RegionCommands(WorldGuard.getInstance()); //no fawe
-	//protected static final RegionCommands regionCommands = new RegionCommands(WorldGuardPlugin.inst()); //fawe
+	protected static final RegionCommands regionCommands = new RegionCommands(WorldGuard.getInstance()); // no fawe
+	// protected static final RegionCommands regionCommands = new
+	// RegionCommands(WorldGuardPlugin.inst()); //fawe
 	protected static final FakeConsoleComandSender fakeCommandSender = new FakeConsoleComandSender();
 	protected static final Set<Character> flagCommandValueFlags = getFlagCommandValueFlags();
-	public static <T> void setFlag(World world, ProtectedRegion region, Flag<T> flag, String value) throws CommandException {
-		CommandContext ccontext = new CommandContext(String.format("flag %s -w %s %s %s", region.getId(), world.getName(), flag.getName(), value), flagCommandValueFlags);
-		FakeConsoleComandSender.setWorld(world);
+
+	public static <T> void setFlag(World world, ProtectedRegion region, Flag<?> flag, String value,
+			org.bukkit.Location location) throws CommandException {
+		CommandContext ccontext = new CommandContext(
+				String.format("flag %s -w %s %s %s", region.getId(), world.getName(), flag.getName(), value),
+				flagCommandValueFlags);
+		FakeConsoleComandSender.setWorld(world, location);
 		regionCommands.flag(ccontext, fakeCommandSender);
 	}
 
-
 	protected static Set<Character> getFlagCommandValueFlags() {
 		try {
-			Method method = RegionCommands.class.getMethod("flag", CommandContext.class, Actor.class); //no fawe
-			//Method method = RegionCommands.class.getMethod("flag", CommandContext.class, CommandSender.class); //fawe
+			Method method = RegionCommands.class.getMethod("flag", CommandContext.class, Actor.class); // no fawe
+			// Method method = RegionCommands.class.getMethod("flag", CommandContext.class,
+			// CommandSender.class); //fawe
 			Command annotation = method.getAnnotation(Command.class);
 			char[] flags = annotation.flags().toCharArray();
 			Set<Character> valueFlags = new HashSet<>();
@@ -133,89 +140,115 @@ public class AutoFlags {
 
 	private static final class FakeConsoleComandSender implements ConsoleCommandSender, Actor, LocalPlayer {
 		private static World world;
+		private static org.bukkit.Location vector;
+
 		@Override
 		public String getName() {
 			return Bukkit.getConsoleSender().getName();
 		}
-		public static void setWorld(World w) {
+
+		public static void setWorld(World w, org.bukkit.Location location) {
 			world = w;
+			vector = location;
 		}
+
 		@Override
 		public Server getServer() {
 			return Bukkit.getServer();
 		}
+
 		@Override
 		public void sendMessage(String arg0) {
 		}
+
 		@Override
 		public void sendMessage(String[] arg0) {
 		}
+
 		@Override
 		public PermissionAttachment addAttachment(Plugin arg0) {
 			return null;
 		}
+
 		@Override
 		public PermissionAttachment addAttachment(Plugin arg0, int arg1) {
 			return null;
 		}
+
 		@Override
 		public PermissionAttachment addAttachment(Plugin arg0, String arg1, boolean arg2) {
 			return null;
 		}
+
 		@Override
 		public PermissionAttachment addAttachment(Plugin arg0, String arg1, boolean arg2, int arg3) {
 			return null;
 		}
+
 		@Override
 		public Set<PermissionAttachmentInfo> getEffectivePermissions() {
 			return Collections.emptySet();
 		}
+
 		@Override
 		public boolean hasPermission(String arg0) {
 			return true;
 		}
+
 		@Override
 		public boolean hasPermission(Permission arg0) {
 			return true;
 		}
+
 		@Override
 		public boolean isPermissionSet(String arg0) {
 			return true;
 		}
+
 		@Override
 		public boolean isPermissionSet(Permission arg0) {
 			return true;
 		}
+
 		@Override
 		public void recalculatePermissions() {
 		}
+
 		@Override
 		public void removeAttachment(PermissionAttachment arg0) {
 		}
+
 		@Override
 		public boolean isOp() {
 			return true;
 		}
+
 		@Override
 		public void setOp(boolean arg0) {
 		}
+
 		@Override
 		public void abandonConversation(Conversation arg0) {
 		}
+
 		@Override
 		public void abandonConversation(Conversation arg0, ConversationAbandonedEvent arg1) {
 		}
+
 		@Override
 		public void acceptConversationInput(String arg0) {
 		}
+
 		@Override
 		public boolean beginConversation(Conversation arg0) {
 			return false;
 		}
+
 		@Override
 		public boolean isConversing() {
 			return false;
 		}
+
 		@Override
 		public void sendRawMessage(String arg0) {
 		}
@@ -232,277 +265,354 @@ public class AutoFlags {
 				}
 			};
 		}
+
 		@Override
 		public UUID getUniqueId() {
 			return UUID.randomUUID();
 		}
+
 		@Override
 		public SessionKey getSessionKey() {
 			return null;
 		}
+
 		@Override
-		public void checkPermission(String arg0) throws AuthorizationException {	
+		public void checkPermission(String arg0) throws AuthorizationException {
 		}
+
 		@Override
 		public String[] getGroups() {
 			return null;
 		}
+
 		@Override
 		public boolean canDestroyBedrock() {
 			return false;
 		}
+
 		@Override
-		public void dispatchCUIEvent(CUIEvent arg0) {	
+		public void dispatchCUIEvent(CUIEvent arg0) {
 		}
+
 		@Override
 		public boolean isPlayer() {
 			return true;
 		}
+
 		@Override
 		public File openFileOpenDialog(String[] arg0) {
 			return null;
 		}
+
 		@Override
 		public File openFileSaveDialog(String[] arg0) {
 			return null;
 		}
+
 		@Override
-		public void print(String arg0) {	
+		public void print(String arg0) {
 		}
+
 		@Override
 		public void print(Component arg0) {
 		}
+
 		@Override
 		public void printDebug(String arg0) {
 		}
+
 		@Override
 		public void printError(String arg0) {
 		}
+
 		@Override
 		public void printRaw(String arg0) {
 		}
+
 		@Override
 		public boolean ascendLevel() {
 			return false;
 		}
+
 		@Override
 		public boolean ascendToCeiling(int arg0) {
 			return false;
 		}
+
 		@Override
 		public boolean ascendToCeiling(int arg0, boolean arg1) {
 			return false;
 		}
+
 		@Override
 		public boolean ascendUpwards(int arg0) {
 			return false;
 		}
+
 		@Override
 		public boolean ascendUpwards(int arg0, boolean arg1) {
 			return false;
 		}
+
 		@Override
 		public boolean descendLevel() {
 			return false;
 		}
+
 		@Override
-		public void findFreePosition() {	
+		public void findFreePosition() {
 		}
+
 		@Override
 		public void findFreePosition(Location arg0) {
 		}
+
 		@Override
 		public void floatAt(int arg0, int arg1, int arg2, boolean arg3) {
 		}
+
 		@Override
 		public Location getBlockIn() {
 			return null;
 		}
+
 		@Override
 		public BaseBlock getBlockInHand(HandSide arg0) throws WorldEditException {
 			return null;
 		}
+
 		@Override
 		public Location getBlockOn() {
 			return null;
 		}
+
 		@Override
 		public Location getBlockTrace(int arg0) {
 			return null;
 		}
+
 		@Override
 		public Location getBlockTrace(int arg0, boolean arg1) {
 			return null;
 		}
+
 		@Override
 		public Location getBlockTrace(int arg0, boolean arg1, Mask arg2) {
 			return null;
 		}
+
 		@Override
 		public Location getBlockTraceFace(int arg0, boolean arg1) {
 			return null;
 		}
+
 		@Override
 		public Location getBlockTraceFace(int arg0, boolean arg1, Mask arg2) {
 			return null;
 		}
+
 		@Override
 		public Direction getCardinalDirection() {
 			return null;
 		}
+
 		@Override
 		public Direction getCardinalDirection(int arg0) {
 			return null;
 		}
+
 		@Override
 		public GameMode getGameMode() {
 			return null;
 		}
+
 		@Override
 		public BlockBag getInventoryBlockBag() {
 			return null;
 		}
+
 		@Override
 		public BaseItemStack getItemInHand(HandSide arg0) {
 			return null;
 		}
+
 		@Override
 		public Location getSolidBlockTrace(int arg0) {
 			return null;
 		}
+
 		@Override
 		public com.sk89q.worldedit.world.World getWorld() {
 			return BukkitAdapter.adapt(world);
 		}
+
 		@Override
 		public void giveItem(BaseItemStack arg0) {
 		}
+
 		@Override
 		public boolean isHoldingPickAxe() {
 			return false;
 		}
+
 		@Override
 		public boolean passThroughForwardWall(int arg0) {
 			return false;
 		}
+
 		@Override
 		public <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 arg0, B arg1) {
 		}
+
 		@Override
 		public void setGameMode(GameMode arg0) {
 		}
+
 		@Override
-		public void setOnGround(Location arg0) {	
+		public void setOnGround(Location arg0) {
 		}
+
 		@Override
-		public void setPosition(Vector3 arg0) {	
+		public void setPosition(Vector3 arg0) {
 		}
+
 		@Override
 		public void setPosition(Vector3 arg0, float arg1, float arg2) {
 		}
+
 		@Override
 		public Extent getExtent() {
 			return null;
 		}
+
 		@Override
 		public Location getLocation() {
-			return new com.sk89q.worldedit.util.Location(BukkitAdapter.adapt(world) , 0, 0, 0);
+			return new com.sk89q.worldedit.util.Location(BukkitAdapter.adapt(world), vector.getX(), vector.getY(),
+					vector.getZ(), vector.getYaw(), vector.getPitch());
 		}
+
 		@Override
 		public BaseEntity getState() {
 			return null;
 		}
+
 		@Override
 		public boolean remove() {
 			return false;
 		}
+
 		@Override
 		public boolean setLocation(Location arg0) {
 			return false;
 		}
+
 		@Override
 		public <T> T getFacet(Class<? extends T> arg0) {
 			return null;
 		}
+
 		@Override
 		public void ban(String arg0) {
 		}
+
 		@Override
 		public float getExhaustion() {
 			return 0;
 		}
+
 		@Override
 		public int getFireTicks() {
 			return 0;
 		}
+
 		@Override
 		public double getFoodLevel() {
 			return 0;
 		}
+
 		@Override
 		public double getHealth() {
 			return 0;
 		}
+
 		@Override
 		public double getMaxHealth() {
 			return 0;
 		}
+
 		@Override
 		public long getPlayerTimeOffset() {
 			return 0;
 		}
+
 		@Override
 		public WeatherType getPlayerWeather() {
 			return null;
 		}
+
 		@Override
 		public double getSaturation() {
 			return 0;
 		}
+
 		@Override
 		public boolean hasGroup(String arg0) {
 			return false;
 		}
+
 		@Override
 		public boolean isPlayerTimeRelative() {
 			return false;
 		}
+
 		@Override
 		public void kick(String arg0) {
 		}
+
 		@Override
 		public void resetFallDistance() {
 		}
+
 		@Override
-		public void resetPlayerTime() {	
+		public void resetPlayerTime() {
 		}
+
 		@Override
 		public void resetPlayerWeather() {
 		}
+
 		@Override
 		public void sendTitle(String arg0, String arg1) {
 		}
+
 		@Override
 		public void setCompassTarget(Location arg0) {
 		}
+
 		@Override
 		public void setExhaustion(float arg0) {
 		}
+
 		@Override
 		public void setFireTicks(int arg0) {
 		}
+
 		@Override
 		public void setFoodLevel(double arg0) {
 		}
+
 		@Override
 		public void setHealth(double arg0) {
 		}
+
 		@Override
 		public void setPlayerTime(long arg0, boolean arg1) {
 		}
+
 		@Override
 		public void setPlayerWeather(WeatherType arg0) {
 		}
+
 		@Override
 		public void setSaturation(double arg0) {
 		}
