@@ -94,15 +94,15 @@ public class AutoFlags {
 	protected static final RegionCommands regionCommands = new RegionCommands(WorldGuard.getInstance()); // no fawe
 	// protected static final RegionCommands regionCommands = new
 	// RegionCommands(WorldGuardPlugin.inst()); //fawe
-	protected static final FakeConsoleComandSender fakeCommandSender = new FakeConsoleComandSender();
 	protected static final Set<Character> flagCommandValueFlags = getFlagCommandValueFlags();
 
 	public static <T> void setFlag(World world, ProtectedRegion region, Flag<?> flag, String value,
 			org.bukkit.Location location) throws CommandException {
+		FakeConsoleComandSender fakeCommandSender = new FakeConsoleComandSender();
 		CommandContext ccontext = new CommandContext(
 				String.format("flag %s -w %s %s %s", region.getId(), world.getName(), flag.getName(), value),
 				flagCommandValueFlags);
-		FakeConsoleComandSender.setWorld(world, location);
+		fakeCommandSender.setWorld(world, location);
 		regionCommands.flag(ccontext, fakeCommandSender);
 	}
 
@@ -127,16 +127,16 @@ public class AutoFlags {
 		}
 	}
 
-	private static final class FakeConsoleComandSender implements Actor, LocalPlayer {
-		private static World world;
-		private static org.bukkit.Location vector;
+	private static class FakeConsoleComandSender implements Actor, LocalPlayer {
+		private World world;
+		private org.bukkit.Location vector;
 
 		@Override
 		public String getName() {
 			return Bukkit.getConsoleSender().getName();
 		}
 
-		public static void setWorld(World w, org.bukkit.Location location) {
+		public void setWorld(World w, org.bukkit.Location location) {
 			world = w;
 			vector = location;
 		}
